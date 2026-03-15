@@ -1,0 +1,204 @@
+-- Create Speed GUI
+local SpeedGUI = Instance.new("ScreenGui")
+SpeedGUI.Name = "SpeedGUI"
+SpeedGUI.DisplayOrder = 1000
+SpeedGUI.IgnoreGuiInset = true
+SpeedGUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Function to make a frame draggable
+local function makeDraggable(frame)
+    local UIS = game:GetService("UserInputService")
+    local dragging, dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+end
+
+-- Smaller Frame
+local SmallerFrame = Instance.new("Frame")
+SmallerFrame.Name = "SmallerSpeedFrame"
+SmallerFrame.Size = UDim2.new(0, 50, 0, 50)
+SmallerFrame.Position = UDim2.new(0.05, 0, 0.9, -60)
+SmallerFrame.BackgroundColor3 = Color3.new(0,0,0) -- black
+SmallerFrame.BorderColor3 = Color3.fromRGB(255,0,0) -- red outline
+SmallerFrame.BorderSizePixel = 2
+SmallerFrame.Parent = SpeedGUI
+makeDraggable(SmallerFrame)
+
+-- Plus Button
+local PlusButton = Instance.new("TextButton")
+PlusButton.Name = "PlusButton"
+PlusButton.Size = UDim2.new(1,0,1,0)
+PlusButton.BackgroundColor3 = Color3.new(0,0,0)
+PlusButton.BorderColor3 = Color3.fromRGB(255,0,0)
+PlusButton.BorderSizePixel = 2
+PlusButton.TextColor3 = Color3.fromRGB(255,0,0)
+PlusButton.Text = "+"
+PlusButton.Font = Enum.Font.SourceSansBold
+PlusButton.TextScaled = true
+PlusButton.Parent = SmallerFrame
+
+-- Speed Label
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Name = "SpeedLabel"
+SpeedLabel.Size = UDim2.new(0,200,0,50)
+SpeedLabel.Position = UDim2.new(1,10,0,0)
+SpeedLabel.BackgroundColor3 = Color3.new(0,0,0)
+SpeedLabel.BorderColor3 = Color3.fromRGB(255,0,0)
+SpeedLabel.BorderSizePixel = 2
+SpeedLabel.TextColor3 = Color3.fromRGB(255,0,0)
+SpeedLabel.Text = "Speed GUI"
+SpeedLabel.Font = Enum.Font.SourceSansBold
+SpeedLabel.TextScaled = true
+SpeedLabel.Parent = SmallerFrame
+
+-- Full Frame
+local FullFrame = Instance.new("Frame")
+FullFrame.Name = "FullSpeedFrame"
+FullFrame.Size = UDim2.new(0,350,0,150)
+FullFrame.Position = UDim2.new(0.05,0,0.5,-75)
+FullFrame.BackgroundColor3 = Color3.new(0,0,0)
+FullFrame.BorderColor3 = Color3.fromRGB(255,0,0)
+FullFrame.BorderSizePixel = 2
+FullFrame.Visible = false
+FullFrame.Parent = SpeedGUI
+makeDraggable(FullFrame)
+
+-- Set Speed Label
+local SetSpeedLabel = Instance.new("TextLabel")
+SetSpeedLabel.Name = "SetSpeedLabel"
+SetSpeedLabel.Size = UDim2.new(1,0,0.2,0)
+SetSpeedLabel.Position = UDim2.new(0,0,0,0)
+SetSpeedLabel.BackgroundColor3 = Color3.new(0,0,0)
+SetSpeedLabel.BorderColor3 = Color3.fromRGB(255,0,0)
+SetSpeedLabel.BorderSizePixel = 2
+SetSpeedLabel.TextColor3 = Color3.fromRGB(255,0,0)
+SetSpeedLabel.Text = "Set Speed"
+SetSpeedLabel.Font = Enum.Font.SourceSansBold
+SetSpeedLabel.TextScaled = true
+SetSpeedLabel.Parent = FullFrame
+
+-- Speed Input
+local SpeedInput = Instance.new("TextBox")
+SpeedInput.Name = "SpeedInput"
+SpeedInput.Size = UDim2.new(0.7,0,0.2,0)
+SpeedInput.Position = UDim2.new(0.15,0,0.3,0)
+SpeedInput.BackgroundColor3 = Color3.new(0,0,0)
+SpeedInput.BorderColor3 = Color3.fromRGB(255,0,0)
+SpeedInput.BorderSizePixel = 2
+SpeedInput.TextColor3 = Color3.fromRGB(255,0,0)
+SpeedInput.PlaceholderText = "Enter Speed"
+SpeedInput.Font = Enum.Font.SourceSansBold
+SpeedInput.TextScaled = true
+SpeedInput.Parent = FullFrame
+
+-- Set Speed Button
+local SetSpeedButton = Instance.new("TextButton")
+SetSpeedButton.Name = "SetSpeedButton"
+SetSpeedButton.Size = UDim2.new(0.7,0,0.2,0)
+SetSpeedButton.Position = UDim2.new(0.15,0,0.6,0)
+SetSpeedButton.BackgroundColor3 = Color3.new(0,0,0)
+SetSpeedButton.BorderColor3 = Color3.fromRGB(255,0,0)
+SetSpeedButton.BorderSizePixel = 2
+SetSpeedButton.TextColor3 = Color3.fromRGB(255,0,0)
+SetSpeedButton.Text = "Set Speed"
+SetSpeedButton.Font = Enum.Font.SourceSansBold
+SetSpeedButton.TextScaled = true
+SetSpeedButton.Parent = FullFrame
+
+-- Minus Button
+local MinusButton = Instance.new("TextButton")
+MinusButton.Name = "MinusButton"
+MinusButton.Size = UDim2.new(0.1,0,0.1,0)
+MinusButton.Position = UDim2.new(0.9,0,0,0)
+MinusButton.BackgroundColor3 = Color3.new(0,0,0)
+MinusButton.BorderColor3 = Color3.fromRGB(255,0,0)
+MinusButton.BorderSizePixel = 2
+MinusButton.TextColor3 = Color3.fromRGB(255,0,0)
+MinusButton.Text = "-"
+MinusButton.Font = Enum.Font.SourceSansBold
+MinusButton.TextScaled = true
+MinusButton.Parent = FullFrame
+
+-- Credits Label
+local CreditLabel = Instance.new("TextLabel")
+CreditLabel.Name = "CreditLabel"
+CreditLabel.Size = UDim2.new(1,0,0.1,0)
+CreditLabel.Position = UDim2.new(0,0,0.9,0)
+CreditLabel.BackgroundColor3 = Color3.new(0,0,0)
+CreditLabel.BorderColor3 = Color3.fromRGB(255,0,0)
+CreditLabel.BorderSizePixel = 2
+CreditLabel.TextColor3 = Color3.fromRGB(255,0,0)
+CreditLabel.Text = "Follow Zarcpizza ON Roblox"
+CreditLabel.Font = Enum.Font.SourceSansBold
+CreditLabel.TextScaled = true
+CreditLabel.Parent = FullFrame
+
+-- Functions for toggling
+local function expandFullGUI()
+    SmallerFrame.Visible = false
+    FullFrame.Visible = true
+end
+
+MinusButton.MouseButton1Click:Connect(function()
+    SmallerFrame.Visible = true
+    FullFrame.Visible = false
+end)
+
+SetSpeedButton.MouseButton1Click:Connect(function()
+    local newSpeed = tonumber(SpeedInput.Text)
+    if newSpeed then
+        SpeedLabel.Text = "Speed: "..newSpeed
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = newSpeed
+            end
+        end
+    else
+        warn("Invalid speed input")
+    end
+end)
+
+PlusButton.MouseButton1Click:Connect(function()
+    if FullFrame.Visible then
+        SmallerFrame.Visible = true
+        FullFrame.Visible = false
+    else
+        expandFullGUI()
+    end
+end)
