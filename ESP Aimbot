@@ -1,0 +1,8 @@
+local fovCircle = Drawing.new("Circle") 
+fovCircle.Position = Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y / 2) 
+fovCircle.Radius = fovRadius 
+fovCircle.Color = Color3.fromRGB(255, 255, 0) 
+fovCircle.Thickness = 1 
+fovCircle.Transparency = 0.6 
+fovCircle.Visible = true 
+fovCircle.Filled = false
