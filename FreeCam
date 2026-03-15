@@ -1,0 +1,164 @@
+--[[ WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk! ]]
+
+local cam = workspace.CurrentCamera
+local UIS = game:GetService("UserInputService")
+local RS = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+local onMobile = not UIS.KeyboardEnabled
+local keysDown = {}
+local rotating = false
+local freecamEnabled = false
+
+local savedWalkSpeed
+local savedJumpPower
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local speed = 0.5
+local fastSpeed = 2
+local sens = 0.3
+
+if onMobile then
+	sens *= 2
+end
+
+local function enableFreecam()
+
+	freecamEnabled = true
+	cam.CameraType = Enum.CameraType.Scriptable
+
+	local char = player.Character
+	if char then
+		local hum = char:FindFirstChild("Humanoid")
+		if hum then
+			savedWalkSpeed = hum.WalkSpeed
+			savedJumpPower = hum.JumpPower
+
+			hum.WalkSpeed = 0
+			hum.JumpPower = 0
+		end
+	end
+end
+
+local function disableFreecam()
+
+	freecamEnabled = false
+	cam.CameraType = Enum.CameraType.Custom
+
+	local char = player.Character
+	if char then
+		local hum = char:FindFirstChild("Humanoid")
+		if hum then
+			hum.WalkSpeed = savedWalkSpeed
+			hum.JumpPower = savedJumpPower
+			cam.CameraSubject = hum
+		end
+	end
+
+	UIS.MouseBehavior = Enum.MouseBehavior.Default
+end
+
+local function renderStepped()
+
+	if not freecamEnabled then
+		return
+	end
+
+	local moveSpeed = speed
+	if keysDown["Enum.KeyCode.LeftShift"] then
+		moveSpeed = fastSpeed
+	end
+
+	if rotating then
+		local delta = UIS:GetMouseDelta()
+		local cf = cam.CFrame
+		local yAngle = cf:ToEulerAngles(Enum.RotationOrder.YZX)
+
+		local newAmount = math.deg(yAngle)+delta.Y
+		if newAmount > 65 or newAmount < -65 then
+			if not (yAngle<0 and delta.Y<0) and not (yAngle>0 and delta.Y>0) then
+				delta = Vector2.new(delta.X,0)
+			end
+		end
+
+		cf *= CFrame.Angles(-math.rad(delta.Y),0,0)
+		cf = CFrame.Angles(0,-math.rad(delta.X),0) * (cf - cf.Position) + cf.Position
+		cf = CFrame.lookAt(cf.Position, cf.Position + cf.LookVector)
+
+		if delta ~= Vector2.new(0,0) then
+			cam.CFrame = cam.CFrame:Lerp(cf,sens)
+		end
+
+		UIS.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
+	end
+
+	if keysDown["Enum.KeyCode.W"] then
+		cam.CFrame *= CFrame.new(0,0,-moveSpeed)
+	end
+	if keysDown["Enum.KeyCode.S"] then
+		cam.CFrame *= CFrame.new(0,0,moveSpeed)
+	end
+	if keysDown["Enum.KeyCode.A"] then
+		cam.CFrame *= CFrame.new(-moveSpeed,0,0)
+	end
+	if keysDown["Enum.KeyCode.D"] then
+		cam.CFrame *= CFrame.new(moveSpeed,0,0)
+	end
+
+	if keysDown["Enum.KeyCode.Q"] then
+		cam.CFrame *= CFrame.new(0,moveSpeed,0)
+	end
+	if keysDown["Enum.KeyCode.E"] then
+		cam.CFrame *= CFrame.new(0,-moveSpeed,0)
+	end
+
+end
+
+RS.RenderStepped:Connect(renderStepped)
+
+local validKeys = {
+	"Enum.KeyCode.W",
+	"Enum.KeyCode.A",
+	"Enum.KeyCode.S",
+	"Enum.KeyCode.D",
+	"Enum.KeyCode.Q",
+	"Enum.KeyCode.E",
+	"Enum.KeyCode.LeftShift"
+}
+
+UIS.InputBegan:Connect(function(Input)
+
+	if Input.KeyCode == Enum.KeyCode.K then
+		if freecamEnabled then
+			disableFreecam()
+		else
+			enableFreecam()
+		end
+	end
+
+	for _, key in pairs(validKeys) do
+		if key == tostring(Input.KeyCode) then
+			keysDown[key] = true
+		end
+	end
+
+	if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+		rotating = true
+	end
+
+end)
+
+UIS.InputEnded:Connect(function(Input)
+
+	for key,_ in pairs(keysDown) do
+		if key == tostring(Input.KeyCode) then
+			keysDown[key] = false
+		end
+	end
+
+	if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+		rotating = false
+	end
+
+end)
