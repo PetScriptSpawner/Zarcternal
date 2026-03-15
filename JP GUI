@@ -1,0 +1,111 @@
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.Name = "JumpPowerGui"
+
+-- Create Frame
+local frame = Instance.new("Frame")
+frame.Parent = screenGui
+frame.BackgroundColor3 = Color3.new(0, 0, 0) -- black bg
+frame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- red outline
+frame.BorderSizePixel = 2
+frame.Size = UDim2.new(0, 300, 0, 250)
+frame.Position = UDim2.new(0.5, -150, 0.5, -125)
+frame.Active = true -- draggable
+
+-- Dragging logic
+local UIS = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+frame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+
+-- Create TextBox
+local textBox = Instance.new("TextBox")
+textBox.Parent = frame
+textBox.Size = UDim2.new(0, 200, 0, 50)
+textBox.Position = UDim2.new(0.5, -100, 0.2, -25)
+textBox.BackgroundColor3 = Color3.new(0,0,0) -- black background
+textBox.BorderColor3 = Color3.fromRGB(255,0,0) -- red outline
+textBox.BorderSizePixel = 2
+textBox.TextColor3 = Color3.fromRGB(255,0,0) -- red text
+textBox.Text = "Enter JumpPower"
+textBox.TextSize = 18
+textBox.TextScaled = true
+textBox.ClearTextOnFocus = true
+
+-- Create TextButton
+local button = Instance.new("TextButton")
+button.Parent = frame
+button.Size = UDim2.new(0, 100, 0, 50)
+button.Position = UDim2.new(0.5, -50, 0.6, -25)
+button.BackgroundColor3 = Color3.new(0,0,0) -- black
+button.BorderColor3 = Color3.fromRGB(255,0,0) -- red outline
+button.BorderSizePixel = 2
+button.TextColor3 = Color3.fromRGB(255,0,0) -- red text
+button.Text = "Set JumpPower"
+button.TextSize = 18
+button.TextScaled = true
+
+-- Create Label
+local label = Instance.new("TextLabel")
+label.Parent = frame
+label.Size = UDim2.new(0,280,0,50)
+label.Position = UDim2.new(0.5,-140,0.85,-25)
+label.BackgroundColor3 = Color3.new(0,0,0)
+label.BorderColor3 = Color3.fromRGB(255,0,0)
+label.BorderSizePixel = 2
+label.TextColor3 = Color3.fromRGB(255,0,0)
+label.Text = "Follow me on Roblox: ZarcPizza"
+label.TextScaled = true
+label.BackgroundTransparency = 0 -- keep bg visible so outline shows
+
+-- Function to set JumpPower
+local function setJumpPower()
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local jumpPower = tonumber(textBox.Text)
+	if humanoid and jumpPower then
+		humanoid.UseJumpPower = true
+		humanoid.JumpPower = jumpPower
+		textBox.Text = "JumpPower set to "..jumpPower
+	else
+		textBox.Text = "Invalid Input"
+	end
+end
+
+button.MouseButton1Click:Connect(setJumpPower)
