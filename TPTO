@@ -1,0 +1,152 @@
+-- Prevent duplicate GUI
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+if playerGui:FindFirstChild("TeleportUI") then
+	return
+end
+
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TeleportUI"
+screenGui.Parent = playerGui
+
+-- MAIN MENU FRAME
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0,220,0,100)
+mainFrame.Position = UDim2.new(0.5,-110,0.5,-50)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner", mainFrame)
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(255,0,0)
+stroke.Thickness = 2
+stroke.Parent = mainFrame
+
+-- GoTo button
+local gotoButton = Instance.new("TextButton")
+gotoButton.Size = UDim2.new(0.8,0,0.5,0)
+gotoButton.Position = UDim2.new(0.1,0,0.25,0)
+gotoButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+gotoButton.Text = "GoTo Player"
+gotoButton.TextColor3 = Color3.new(1,1,1)
+gotoButton.TextScaled = true
+gotoButton.Font = Enum.Font.GothamBold
+gotoButton.Parent = mainFrame
+
+local btnCorner = Instance.new("UICorner", gotoButton)
+
+-- TELEPORT GUI FUNCTION
+local function createTeleportGUI()
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0,260,0,300)
+	frame.Position = UDim2.new(0.5,-130,0.5,-150)
+	frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+	frame.BorderSizePixel = 0
+	frame.Active = true
+	frame.Draggable = true
+	frame.Parent = screenGui
+
+	local corner2 = Instance.new("UICorner", frame)
+
+	local stroke2 = Instance.new("UIStroke")
+	stroke2.Color = Color3.fromRGB(255,0,0)
+	stroke2.Thickness = 2
+	stroke2.Parent = frame
+
+	-- Close button
+	local close = Instance.new("TextButton")
+	close.Size = UDim2.new(0,25,0,25)
+	close.Position = UDim2.new(1,-30,0,5)
+	close.Text = "X"
+	close.BackgroundColor3 = Color3.fromRGB(170,0,0)
+	close.TextColor3 = Color3.new(1,1,1)
+	close.TextScaled = true
+	close.Font = Enum.Font.GothamBold
+	close.Parent = frame
+
+	local closeCorner = Instance.new("UICorner", close)
+
+	close.MouseButton1Click:Connect(function()
+		screenGui:Destroy()
+	end)
+
+	-- Title
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1,0,0,30)
+	title.BackgroundTransparency = 1
+	title.Text = "Player List"
+	title.TextColor3 = Color3.new(1,1,1)
+	title.TextScaled = true
+	title.Font = Enum.Font.GothamBold
+	title.Parent = frame
+
+	-- Scrolling player list
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.Size = UDim2.new(0.9,0,0.75,0)
+	scroll.Position = UDim2.new(0.05,0,0.18,0)
+	scroll.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	scroll.BorderSizePixel = 0
+	scroll.CanvasSize = UDim2.new(0,0,0,0)
+	scroll.ScrollBarThickness = 6
+	scroll.Parent = frame
+
+	local scrollCorner = Instance.new("UICorner", scroll)
+
+	local layout = Instance.new("UIListLayout")
+	layout.Parent = scroll
+	layout.Padding = UDim.new(0,5)
+
+	-- Function to add player button
+	local function addPlayer(plr)
+
+		if plr == player then return end
+
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1,-5,0,30)
+		btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+		btn.Text = plr.Name
+		btn.TextColor3 = Color3.new(1,1,1)
+		btn.TextScaled = true
+		btn.Font = Enum.Font.Gotham
+		btn.Parent = scroll
+
+		local btnCorner = Instance.new("UICorner", btn)
+
+		btn.MouseButton1Click:Connect(function()
+
+			if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+				local char = player.Character
+				if char and char:FindFirstChild("HumanoidRootPart") then
+					char.HumanoidRootPart.CFrame =
+						plr.Character.HumanoidRootPart.CFrame
+				end
+			end
+
+		end)
+
+	end
+
+	-- Add existing players
+	for _,plr in pairs(game.Players:GetPlayers()) do
+		addPlayer(plr)
+	end
+
+	-- Add new players when they join
+	game.Players.PlayerAdded:Connect(addPlayer)
+
+end
+
+-- BUTTON CLICK
+gotoButton.MouseButton1Click:Connect(function()
+
+	mainFrame:Destroy() -- delete the first frame
+	createTeleportGUI() -- open player list GUI
+
+end)
